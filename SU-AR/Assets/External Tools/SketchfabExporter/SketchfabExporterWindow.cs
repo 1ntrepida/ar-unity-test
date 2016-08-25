@@ -21,7 +21,7 @@ public class SketchfabExporterWww : MonoBehaviour {
 	
 	public IEnumerator UploadFileCo(string localFileName, string token, bool model_private, string title, string description, string tags)
     {
-        #if UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX // edit: added Platform Dependent Compilation - win or osx standalone - will not get called anyway if false
+        #if UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_ANDROID// edit: added Platform Dependent Compilation - win or osx standalone - will not get called anyway if false
         byte[] data = File.ReadAllBytes(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + localFileName);
 		if (data.Length > 0) {
 			Debug.Log("Loaded file successfully : " + data.Length + " bytes");
@@ -43,7 +43,7 @@ public class SketchfabExporterWww : MonoBehaviour {
 		
 		www = new WWW(api_url, postForm);        
 		
-        #endif
+#endif
         yield return www;
 
         }
@@ -81,8 +81,10 @@ public class SketchfabExporterWww : MonoBehaviour {
 	}
 	
 	public void upload(string filename, string token, bool model_private, string title, string description, string tags) {
-		StartCoroutine(UploadFileCo(filename, token, model_private, title, description, tags));
-	}
+    #if UNITY_EDITOR
+        StartCoroutine(UploadFileCo(filename, token, model_private, title, description, tags));
+#endif
+    }
 }
 
 public class SketchfabExporter
@@ -401,7 +403,7 @@ public class SketchfabExporterWindow : EditorWindow
     [MenuItem("Window/Export selection to Sketchfab...")]
 	static void Init()
     {
-    #if UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX // edit: added Platform Dependent Compilation - win or osx standalone
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_ANDROID// edit: added Platform Dependent Compilation - win or osx standalone
         SketchfabExporterWindow window = (SketchfabExporterWindow)EditorWindow.GetWindow (typeof(SketchfabExporterWindow));
 		window.initialize();
     #else // and error dialog if not standalone
